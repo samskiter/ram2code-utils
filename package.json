@@ -37,6 +37,6 @@ cd {
     "gulp-mocha": "2.0.0",
     "mocha": "^2.0.1",
     "run-sequence": "^1.0.2",
-    "raml2code-fixtures": "0.0.2"
+    "raml2code-fixtures": "0.0.3"
   }
 }
