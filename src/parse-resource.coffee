@@ -8,6 +8,11 @@ util = {}
 
 util.parseResource = (resource, options, schemas, customAdapter = null, parentUri = "", parentUriArgs = []) ->
   parsed = []
+  
+  resourceUri = parentUri + resource.relativeUri
+  uriArgs = getUriParameter(resource, options.annotations.path, options.mapping)
+  uriArgs = parentUriArgs.concat(uriArgs)
+  
   if resource.methods
     for m in resource.methods
       methodDef = {}
@@ -16,8 +21,7 @@ util.parseResource = (resource, options, schemas, customAdapter = null, parentUr
       methodDef.name = m.method + resource.displayName
       methodDef.displayName = resource.displayName
       uriArgs = getUriParameter(resource, options.annotations.path, options.mapping)
-      methodDef.args = parentUriArgs.concat(uriArgs)
-      methodDef.args = methodDef.args.concat(getQueryParams(m.queryParameters, options.annotations.query, options.mapping))
+      methodDef.args = uriArgs.concat(getQueryParams(m.queryParameters, options.annotations.query, options.mapping))
       methodDef.args = methodDef.args.concat(parseForm(m.body, options.annotations, options.mapping))
       request = utilSchemas.parseBodyJson(m.body, "#{methodDef.uri} body")
       responseBody = null
@@ -47,9 +51,7 @@ util.parseResource = (resource, options, schemas, customAdapter = null, parentUr
 
   if resource.resources
     for innerResource in resource.resources
-      if methodDef
-        methodDefUri = methodDef.uri
-      parsed = parsed.concat(util.parseResource(innerResource, options, schemas, customAdapter, methodDefUri, uriArgs))
+      parsed = parsed.concat(util.parseResource(innerResource, options, schemas, customAdapter, resourceUri, uriArgs))
 
   parsed
 
