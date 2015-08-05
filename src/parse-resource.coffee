@@ -12,7 +12,7 @@ util.parseResource = (resource, options, schemas, customAdapter = null, parentUr
     methodDef = {}
     methodDef.uri = parentUri + resource.relativeUri
     methodDef.annotation = m.method.toUpperCase()
-    methodDef.name = m.method + resource.displayName
+    methodDef.name = camelCase(m.method + ' ' + resource.displayName)
     methodDef.displayName = resource.displayName
     uriArgs = getUriParameter(resource, options.annotations.path, options.mapping)
     methodDef.args = parentUriArgs.concat(uriArgs)
