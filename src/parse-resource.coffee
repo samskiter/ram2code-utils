@@ -8,37 +8,38 @@ util = {}
 
 util.parseResource = (resource, options, schemas, customAdapter = null, parentUri = "", parentUriArgs = []) ->
   parsed = []
-  for m in resource.methods
-    methodDef = {}
-    methodDef.uri = parentUri + resource.relativeUri
-    methodDef.annotation = m.method.toUpperCase()
-    methodDef.name = m.method + resource.displayName
-    methodDef.displayName = resource.displayName
-    uriArgs = getUriParameter(resource, options.annotations.path, options.mapping)
-    methodDef.args = parentUriArgs.concat(uriArgs)
-    methodDef.args = methodDef.args.concat(getQueryParams(m.queryParameters, options.annotations.query, options.mapping))
-    methodDef.args = methodDef.args.concat(parseForm(m.body, options.annotations, options.mapping))
-    request = utilSchemas.parseBodyJson(m.body, "#{methodDef.uri} body")
-    respond = utilSchemas.parseBodyJson(getBestValidResponse(m.responses).body, "#{methodDef.uri} response")
-
-    if request.title
-      methodDef.args = methodDef.args ? []
-      classType = mapRequestResponse(request, schemas, options.mapping)
-      methodDef.args.push {'kind': options.annotations.body, 'classType': classType, 'name': camelCase(request.title)}
-
-    methodDef.request = request.title ? null
-    responseType = mapRequestResponse(respond, schemas, options.mapping)
-    methodDef.respondComment = respond.title
-    if responseType
-      methodDef.respond =  responseType
-    else
-      methodDef.respond =  "Response"
-
-    #Sometimes is necessary to adapt the generic parser
-    if customAdapter and typeof customAdapter is 'function'
-      customAdapter(m, methodDef)
-
-    parsed.push methodDef
+  if m
+    for m in resource.methods
+      methodDef = {}
+      methodDef.uri = parentUri + resource.relativeUri
+      methodDef.annotation = m.method.toUpperCase()
+      methodDef.name = m.method + resource.displayName
+      methodDef.displayName = resource.displayName
+      uriArgs = getUriParameter(resource, options.annotations.path, options.mapping)
+      methodDef.args = parentUriArgs.concat(uriArgs)
+      methodDef.args = methodDef.args.concat(getQueryParams(m.queryParameters, options.annotations.query, options.mapping))
+      methodDef.args = methodDef.args.concat(parseForm(m.body, options.annotations, options.mapping))
+      request = utilSchemas.parseBodyJson(m.body, "#{methodDef.uri} body")
+      respond = utilSchemas.parseBodyJson(getBestValidResponse(m.responses).body, "#{methodDef.uri} response")
+  
+      if request.title
+        methodDef.args = methodDef.args ? []
+        classType = mapRequestResponse(request, schemas, options.mapping)
+        methodDef.args.push {'kind': options.annotations.body, 'classType': classType, 'name': camelCase(request.title)}
+  
+      methodDef.request = request.title ? null
+      responseType = mapRequestResponse(respond, schemas, options.mapping)
+      methodDef.respondComment = respond.title
+      if responseType
+        methodDef.respond =  responseType
+      else
+        methodDef.respond =  "Response"
+  
+      #Sometimes is necessary to adapt the generic parser
+      if customAdapter and typeof customAdapter is 'function'
+        customAdapter(m, methodDef)
+  
+      parsed.push methodDef
 
   if resource.resources
     for innerResource in resource.resources
