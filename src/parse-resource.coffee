@@ -20,7 +20,6 @@ util.parseResource = (resource, options, schemas, customAdapter = null, parentUr
       methodDef.annotation = m.method.toUpperCase()
       methodDef.name = camelCase(m.method + ' ' + resource.displayName)
       methodDef.displayName = resource.displayName
-      uriArgs = getUriParameter(resource, options.annotations.path, options.mapping)
       methodDef.args = uriArgs.concat(getQueryParams(m.queryParameters, options.annotations.query, options.mapping))
       methodDef.args = methodDef.args.concat(parseForm(m.body, options.annotations, options.mapping))
       request = utilSchemas.parseBodyJson(m.body, "#{methodDef.uri} body")
